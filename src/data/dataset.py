@@ -24,12 +24,17 @@ def cord_to_target_sequence(ground_truth: dict) -> str:
 
     # 상단 정보 (가게명, 날짜 등)
     menu_items = gt_parse.get("menu", [])
+    # menu가 dict로 오는 샘플 대응 (CORD v2 일부 샘플)
+    if isinstance(menu_items, dict):
+        menu_items = [menu_items]
     sub_total = gt_parse.get("sub_total", {})
     total = gt_parse.get("total", {})
 
     if menu_items:
         parts.append("<s_menu>")
         for item in menu_items:
+            if not isinstance(item, dict):
+                continue
             parts.append("<s_menuitem>")
             if "nm" in item:
                 parts.append(f"<s_nm>{item['nm']}</s_nm>")
