@@ -51,13 +51,14 @@ WandB run 링크도 함께 첨부할 것.
 - max_length=512로 truncation 없이 전체 학습 가능
 
 ### 실험 0: Zero-shot 베이스라인
-- **날짜**:
+- **날짜**: 2026-03-17
 - **가설**: Florence-2-base는 영어 문서에는 어느 정도 작동하지만 한국어에는 약할 것
-- **설정**: 파인튜닝 없음, CORD 테스트셋 20개
+- **설정**: 파인튜닝 없음, CORD 테스트셋 20개, 프롬프트 `<DocVQA>`
 - **결과**:
-  - Field F1:
-  - CER:
-- **분석**:
+  - Field F1: **0.0000**
+  - CER: **0.9972**
+- **분석**: 파인튜닝 없이는 `<s_menu>`, `<s_total>` 같은 우리 포맷으로 출력하지 못함. F1=0은 예상된 결과. CER≈1.0은 정답과 출력이 완전히 다름을 의미. LoRA 파인튜닝 후 이 수치가 얼마나 올라가는지가 핵심 지표.
+- **WandB**: https://wandb.ai/sthun0211-home/korean-doc-understanding/runs/7n66imiy
 
 ---
 
