@@ -153,7 +153,7 @@ class CORDDataset(Dataset):
             return A.Compose([
                 A.Rotate(limit=5, p=0.3),
                 A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
-                A.GaussNoise(var_limit=(10, 30), p=0.2),
+                A.GaussNoise(std_range=(0.04, 0.12), p=0.2),
                 A.GaussianBlur(blur_limit=(3, 3), p=0.1),
             ])
         except ImportError:
