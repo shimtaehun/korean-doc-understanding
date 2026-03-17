@@ -179,13 +179,12 @@ class CORDDataset(Dataset):
         target_sequence = cord_to_target_sequence(ground_truth)
 
         # Florence-2 processor로 인코딩
+        # max_length/padding/truncation은 processor에 전달하지 않음:
+        # 내부적으로 image token 수를 뺀 길이가 음수가 되어 OverflowError 발생
         encoding = self.processor(
             text=self.PROMPT,
             images=image,
             return_tensors="pt",
-            padding="max_length",
-            max_length=self.max_length,
-            truncation=True,
         )
 
         # 타겟 레이블 토크나이징
