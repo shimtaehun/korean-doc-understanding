@@ -1,0 +1,23 @@
+# 서빙 설정 파일
+# 사용법: uvicorn src.serving.app:app --reload --port 8000
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  reload: false
+
+model:
+  checkpoint_path: "outputs/checkpoints/best_model"  # 학습 후 경로 지정
+  device: "cuda"  # "cuda" or "cpu"
+  quantization: "int8"  # "fp32", "fp16", "int8", "int4"
+  max_new_tokens: 512
+
+inference:
+  image_size: 768
+  batch_size: 1
+  timeout_seconds: 30
+
+logging:
+  level: "INFO"
+  response_time: true

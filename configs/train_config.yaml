@@ -1,0 +1,50 @@
+# 학습 설정 파일
+# 사용법: python src/training/train.py --config configs/train_config.yaml
+
+model:
+  name: "microsoft/Florence-2-base-ft"
+  max_length: 512
+  image_size: 768
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: ["q_proj", "v_proj"]
+  bias: "none"
+
+training:
+  epochs: 10
+  batch_size: 4
+  gradient_accumulation_steps: 4  # effective batch_size = 16
+  learning_rate: 5e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  lr_scheduler: "cosine"
+  max_grad_norm: 1.0
+  fp16: true
+  seed: 42
+
+data:
+  # CORD v2: HuggingFace에서 직접 로드 (로컬 경로 불필요)
+  # load_dataset("naver-clova-ix/cord-v2") → train/validation/test split 자동 제공
+  hf_dataset: "naver-clova-ix/cord-v2"
+
+  # AI Hub 한국어 데이터 (3주차, 로컬 다운로드 후 경로 지정)
+  # hf_dataset을 쓰지 않을 경우에만 아래 경로 사용
+  local_train_dir: null   # "data/processed/train"
+  local_val_dir: null     # "data/processed/val"
+  local_test_dir: null    # "data/processed/test"
+
+  num_workers: 4
+
+wandb:
+  project: "korean-doc-understanding"
+  entity: null  # WandB 사용자명 입력
+  log_interval: 10
+
+output:
+  checkpoint_dir: "outputs/checkpoints"
+  save_every_n_epochs: 1
+  save_best_only: true
+  metric_for_best: "field_f1"
