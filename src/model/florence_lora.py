@@ -50,6 +50,7 @@ def load_florence_with_lora(
         model_id,
         trust_remote_code=True,  # Florence-2 필수
         torch_dtype=torch_dtype,
+        attn_implementation="eager",  # flash_attn 없이 실행
     ).to(device)
 
     lora_config = LoraConfig(
@@ -93,6 +94,7 @@ def load_florence_for_inference(
         base_model_id,
         trust_remote_code=True,
         torch_dtype=torch_dtype,
+        attn_implementation="eager",
     )
 
     model = PeftModel.from_pretrained(base_model, lora_checkpoint_path)
