@@ -5,6 +5,7 @@ from typing import Optional
 
 import torch
 from jiwer import cer
+from torch.amp import autocast
 from torch.utils.data import DataLoader
 
 
@@ -69,12 +70,13 @@ def evaluate(
             input_ids = batch["input_ids"].to(device)
             labels = batch["labels"].to(device)  # (B, L), -100 마스킹
 
-            output_ids = model.generate(
-                input_ids=input_ids,
-                pixel_values=pixel_values,
-                max_new_tokens=max_new_tokens,
-                num_beams=3,
-            )
+            with autocast("cuda", dtype=torch.float16):
+                output_ids = model.generate(
+                    input_ids=input_ids,
+                    pixel_values=pixel_values,
+                    max_new_tokens=max_new_tokens,
+                    num_beams=3,
+                )
 
             # 입력 토큰 제거 후 디코딩
             generated = output_ids[:, input_ids.shape[1]:]
