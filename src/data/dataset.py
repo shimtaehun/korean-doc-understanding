@@ -30,6 +30,12 @@ def cord_to_target_sequence(ground_truth: dict) -> str:
     sub_total = gt_parse.get("sub_total", {})
     total = gt_parse.get("total", {})
 
+    # sub_total / total이 list로 오는 샘플 대응
+    if isinstance(sub_total, list):
+        sub_total = sub_total[0] if sub_total and isinstance(sub_total[0], dict) else {}
+    if isinstance(total, list):
+        total = total[0] if total and isinstance(total[0], dict) else {}
+
     if menu_items:
         parts.append("<s_menu>")
         for item in menu_items:
@@ -45,13 +51,13 @@ def cord_to_target_sequence(ground_truth: dict) -> str:
             parts.append("</s_menuitem>")
         parts.append("</s_menu>")
 
-    if sub_total:
+    if isinstance(sub_total, dict) and sub_total:
         parts.append("<s_sub_total>")
         for key, value in sub_total.items():
             parts.append(f"<s_{key}>{value}</s_{key}>")
         parts.append("</s_sub_total>")
 
-    if total:
+    if isinstance(total, dict) and total:
         parts.append("<s_total>")
         for key, value in total.items():
             parts.append(f"<s_{key}>{value}</s_{key}>")
