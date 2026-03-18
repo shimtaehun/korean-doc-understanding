@@ -46,30 +46,12 @@ def load_florence_with_lora(
 
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
 
-    # CORD XML 태그를 단일 특수 토큰으로 등록 → 태그 오타 방지
-    cord_tags = [
-        "<s_menu>", "</s_menu>", "<s_menuitem>", "</s_menuitem>",
-        "<s_nm>", "</s_nm>", "<s_price>", "</s_price>", "<s_cnt>", "</s_cnt>",
-        "<s_sub_total>", "</s_sub_total>",
-        "<s_subtotal_price>", "</s_subtotal_price>",
-        "<s_tax_price>", "</s_tax_price>",
-        "<s_total>", "</s_total>", "<s_total_price>", "</s_total_price>",
-        "<s_cashprice>", "</s_cashprice>", "<s_changeprice>", "</s_changeprice>",
-        "<s_void_menu>", "</s_void_menu>",
-    ]
-    new_tokens = [t for t in cord_tags if t not in processor.tokenizer.get_vocab()]
-    if new_tokens:
-        processor.tokenizer.add_tokens(new_tokens)
-
     base_model = AutoModelForCausalLM.from_pretrained(
         model_id,
         trust_remote_code=True,  # Florence-2 필수
         torch_dtype=torch_dtype,
         attn_implementation="eager",  # flash_attn 없이 실행
     ).to(device)
-
-    # 새 토큰 임베딩 크기 조정
-    base_model.resize_token_embeddings(len(processor.tokenizer))
 
     lora_config = LoraConfig(
         r=lora_settings.r,
