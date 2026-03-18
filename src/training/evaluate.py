@@ -9,6 +9,11 @@ from torch.amp import autocast
 from torch.utils.data import DataLoader
 
 
+def normalize_xml_tags(text: str) -> str:
+    """태그 prefix 오타 정규화: </r_price> → </s_price>, <is_cnt> → <s_cnt>"""
+    return re.sub(r"<(/?)[a-z]{0,2}_", r"<\1s_", text)
+
+
 def extract_fields(text: str) -> dict:
     """XML-like 시퀀스에서 리프 필드(중첩 없는 태그) 값만 추출.
 
@@ -103,7 +108,7 @@ def evaluate(
             gt_texts = processor.batch_decode(gt_ids, skip_special_tokens=True)
 
             for pred, gt in zip(pred_texts, gt_texts):
-                pred_fields = extract_fields(pred)
+                pred_fields = extract_fields(normalize_xml_tags(pred))
                 gt_fields = extract_fields(gt)
                 f1_scores.append(compute_field_f1(pred_fields, gt_fields))
                 cer_scores.append(cer(gt, pred) if gt.strip() else 1.0)

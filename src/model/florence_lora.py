@@ -81,12 +81,6 @@ def load_florence_with_lora(
     )
 
     model = get_peft_model(base_model, lora_config)
-
-    # 새 토큰 임베딩은 LoRA가 freeze하지 않도록 requires_grad 유지
-    for name, param in model.named_parameters():
-        if "embed_tokens" in name or "lm_head" in name or "shared" in name:
-            param.requires_grad = True
-
     model.print_trainable_parameters()
 
     return model, processor
