@@ -78,14 +78,13 @@ def evaluate(
                     num_beams=3,
                 )
 
-            # 입력 토큰 제거 후 디코딩
-            generated = output_ids[:, input_ids.shape[1]:]
-            pred_texts = processor.batch_decode(generated, skip_special_tokens=False)
+            # Florence-2: 전체 output 디코딩 (slicing 없이) → XML 태그는 regex로 추출
+            pred_texts = processor.batch_decode(output_ids, skip_special_tokens=True)
 
             # labels에서 -100 제거 후 디코딩 (정답)
             gt_ids = labels.clone()
             gt_ids[gt_ids == -100] = processor.tokenizer.pad_token_id
-            gt_texts = processor.batch_decode(gt_ids, skip_special_tokens=False)
+            gt_texts = processor.batch_decode(gt_ids, skip_special_tokens=True)
 
             for pred, gt in zip(pred_texts, gt_texts):
                 pred_fields = extract_fields(pred)
