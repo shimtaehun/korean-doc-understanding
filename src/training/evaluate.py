@@ -10,10 +10,16 @@ from torch.utils.data import DataLoader
 
 
 def extract_fields(text: str) -> dict:
-    """XML-like 시퀀스에서 필드 값 추출."""
+    """XML-like 시퀀스에서 리프 필드(중첩 없는 태그) 값만 추출.
+
+    예: <s_nm>REAL GANACHE</s_nm> → {"nm": "REAL GANACHE"}
+    중첩 태그(<s_menu>, <s_menuitem> 등)는 무시하고 실제 값만 비교.
+    """
     fields = {}
-    for match in re.finditer(r"<s_(\w+)>(.*?)</s_\1>", text, re.DOTALL):
+    for match in re.finditer(r"<s_(\w+)>([^<]+?)</s_\1>", text):
         key, value = match.group(1), match.group(2).strip()
+        if not value:
+            continue
         if key in fields:
             if isinstance(fields[key], list):
                 fields[key].append(value)
