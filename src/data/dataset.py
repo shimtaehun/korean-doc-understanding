@@ -125,7 +125,7 @@ class CORDDataset(Dataset):
         augment: 학습 시 augmentation 적용 여부
     """
 
-    PROMPT = "<DocVQA>"
+    PROMPT = "<DocVQA>Extract all menu items, prices, subtotal, and total from this receipt."
 
     def __init__(
         self,

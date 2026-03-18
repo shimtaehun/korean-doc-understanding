@@ -74,8 +74,10 @@ def evaluate(
                 output_ids = model.generate(
                     input_ids=input_ids,
                     pixel_values=pixel_values,
+                    attention_mask=batch["attention_mask"].to(device),
                     max_new_tokens=max_new_tokens,
                     num_beams=3,
+                    early_stopping=False,
                 )
 
             # Florence-2: 전체 output 디코딩 (slicing 없이) → XML 태그는 regex로 추출
