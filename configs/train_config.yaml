@@ -47,4 +47,4 @@ output:
   checkpoint_dir: "outputs/checkpoints"
   save_every_n_epochs: 1
   save_best_only: true
-  metric_for_best: "cer"  # CER 기준 저장 (F1이 0인 구간에도 best 갱신 가능)
+  metric_for_best: "field_f1"  # F1 기준 저장
