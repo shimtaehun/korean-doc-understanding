@@ -14,7 +14,7 @@ lora:
   bias: "none"
 
 training:
-  epochs: 15
+  epochs: 30
   batch_size: 4
   gradient_accumulation_steps: 4  # effective batch_size = 16
   learning_rate: 0.00005

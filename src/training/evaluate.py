@@ -70,17 +70,25 @@ def evaluate(
     model.eval()
     f1_scores, cer_scores = [], []
 
+    # Florence-2 decoder forced start: [EOS, BOS, <s_menu>_tokens]
+    # 훈련 패턴(EOS→BOS→XML)과 맞춰 XML 생성을 유도
+    _menu_ids = processor.tokenizer.encode("<s_menu>", add_special_tokens=False)
+    _decoder_prefix = [processor.tokenizer.eos_token_id, processor.tokenizer.bos_token_id] + _menu_ids
+    decoder_input_ids = torch.tensor([_decoder_prefix], device=device)
+
     with torch.no_grad():
         for batch in loader:
             pixel_values = batch["pixel_values"].to(device)
             input_ids = batch["input_ids"].to(device)
             labels = batch["labels"].to(device)  # (B, L), -100 마스킹
+            batch_size = pixel_values.shape[0]
 
             with autocast("cuda", dtype=torch.float16):
                 output_ids = model.generate(
                     input_ids=input_ids,
                     pixel_values=pixel_values,
                     attention_mask=batch["attention_mask"].to(device),
+                    decoder_input_ids=decoder_input_ids.expand(batch_size, -1),
                     max_new_tokens=max_new_tokens,
                     num_beams=3,
                     early_stopping=False,
