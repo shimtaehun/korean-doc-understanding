@@ -10,8 +10,8 @@ from torch.utils.data import DataLoader
 
 
 def normalize_xml_tags(text: str) -> str:
-    """태그 prefix 오타 정규화: </r_price> → </s_price>, <is_cnt> → <s_cnt>"""
-    return re.sub(r"<(/?)[a-z]{0,2}_", r"<\1s_", text)
+    """태그 prefix 오타 정규화: </r_price> → </s_price>, <s-price> → <s_price>"""
+    return re.sub(r"<(/?)[a-zA-Z]{0,3}[-,._]", lambda m: f"<{m.group(1)}s_", text)
 
 
 def extract_fields(text: str) -> dict:

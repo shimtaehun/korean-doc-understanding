@@ -7,17 +7,17 @@ model:
   image_size: 768
 
 lora:
-  r: 8
-  alpha: 16
+  r: 16
+  alpha: 32
   dropout: 0.05
-  target_modules: ["q_proj", "v_proj"]
+  target_modules: ["q_proj", "k_proj", "v_proj", "out_proj", "fc1", "fc2"]
   bias: "none"
 
 training:
   epochs: 30
   batch_size: 4
   gradient_accumulation_steps: 4  # effective batch_size = 16
-  learning_rate: 0.00005
+  learning_rate: 0.0001
   weight_decay: 0.01
   warmup_ratio: 0.1
   lr_scheduler: "cosine"
