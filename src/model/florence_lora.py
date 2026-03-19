@@ -26,6 +26,7 @@ def load_florence_with_lora(
     lora_settings: Optional[LoRASettings] = None,
     torch_dtype: torch.dtype = torch.float16,
     device: Optional[str] = None,
+    special_tokens: Optional[list] = None,
 ) -> tuple:
     """Florence-2에 LoRA를 적용해 반환.
 
@@ -34,6 +35,7 @@ def load_florence_with_lora(
         lora_settings: LoRA 설정 (None이면 기본값 사용)
         torch_dtype: 모델 가중치 dtype
         device: 로드할 디바이스 (None이면 자동)
+        special_tokens: 추가할 특수 토큰 리스트 (CORD XML 태그 등)
 
     Returns:
         (model, processor) 튜플
@@ -46,12 +48,32 @@ def load_florence_with_lora(
 
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
 
+    # 특수 토큰 등록 (모델 로드 전에 tokenizer에 추가)
+    if special_tokens:
+        num_added = processor.tokenizer.add_tokens(special_tokens)
+        print(f"특수 토큰 {num_added}개 추가 (전체 vocab: {len(processor.tokenizer)})")
+
     base_model = AutoModelForCausalLM.from_pretrained(
         model_id,
         trust_remote_code=True,  # Florence-2 필수
         torch_dtype=torch_dtype,
         attn_implementation="eager",  # flash_attn 없이 실행
-    ).to(device)
+    )
+
+    # 임베딩 크기 확장 + 새 토큰 임베딩을 기존 평균으로 초기화
+    if special_tokens:
+        old_vocab_size = base_model.get_input_embeddings().weight.shape[0]
+        base_model.resize_token_embeddings(len(processor.tokenizer))
+        num_new = len(processor.tokenizer) - old_vocab_size
+        if num_new > 0:
+            with torch.no_grad():
+                embeds = base_model.get_input_embeddings().weight
+                embeds.data[-num_new:] = embeds.data[:-num_new].mean(dim=0)
+                lm_head = base_model.get_output_embeddings()
+                if lm_head is not None:
+                    lm_head.weight.data[-num_new:] = lm_head.weight.data[:-num_new].mean(dim=0)
+
+    base_model = base_model.to(device)
 
     lora_config = LoraConfig(
         r=lora_settings.r,
@@ -60,6 +82,8 @@ def load_florence_with_lora(
         target_modules=lora_settings.target_modules,
         bias=lora_settings.bias,
         task_type=TaskType.CAUSAL_LM,
+        # 특수 토큰 사용 시 임베딩/lm_head를 full로 학습
+        modules_to_save=["embed_tokens", "lm_head"] if special_tokens else None,
     )
 
     model = get_peft_model(base_model, lora_config)

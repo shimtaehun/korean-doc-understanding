@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, random_split
 from transformers import get_cosine_schedule_with_warmup
 from datasets import load_dataset
 
-from src.data.dataset import CORDDataset
+from src.data.dataset import CORDDataset, CORD_SPECIAL_TOKENS
 from src.model.florence_lora import LoRASettings, load_florence_with_lora
 from src.training.evaluate import evaluate
 
@@ -167,6 +167,7 @@ def train(config_path: str) -> None:
         model_id=cfg["model"]["name"],
         lora_settings=lora_settings,
         device=device,
+        special_tokens=CORD_SPECIAL_TOKENS,
     )
 
     # DataLoader

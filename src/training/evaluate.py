@@ -10,8 +10,19 @@ from torch.utils.data import DataLoader
 
 
 def normalize_xml_tags(text: str) -> str:
-    """태그 prefix 오타 정규화: </r_price> → </s_price>, <s-price> → <s_price>"""
-    return re.sub(r"<(/?)[a-zA-Z]{0,3}[-,._]", lambda m: f"<{m.group(1)}s_", text)
+    """태그 정규화: 대소문자, 공백, 구분자 변형 모두 처리.
+
+    예: <S_price> → <s_price>, <s -cnt> → <s_cnt>, <s\xa0cashprice> → <s_cashprice>
+    """
+    def fix_tag(m: re.Match) -> str:
+        inner = m.group(1).lower()
+        # prefix + 구분자(공백/특수문자) → s_
+        inner = re.sub(r"^(/?)([a-z]{0,3})[\s\xa0\-,._]+", r"\1s_", inner)
+        # 남은 공백 제거
+        inner = re.sub(r"[\s\xa0]", "", inner)
+        return f"<{inner}>"
+
+    return re.sub(r"<([^>\n]{1,50})>", fix_tag, text)
 
 
 def extract_fields(text: str) -> dict:

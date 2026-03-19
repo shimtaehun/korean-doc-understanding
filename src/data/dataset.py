@@ -10,6 +10,28 @@ from torch.utils.data import Dataset
 from transformers import AutoProcessor
 
 
+CORD_SPECIAL_TOKENS = [
+    "<s_menu>", "</s_menu>",
+    "<s_menuitem>", "</s_menuitem>",
+    "<s_nm>", "</s_nm>",
+    "<s_price>", "</s_price>",
+    "<s_cnt>", "</s_cnt>",
+    "<s_sub_total>", "</s_sub_total>",
+    "<s_subtotal_price>", "</s_subtotal_price>",
+    "<s_discount_price>", "</s_discount_price>",
+    "<s_service_price>", "</s_service_price>",
+    "<s_tax_price>", "</s_tax_price>",
+    "<s_menutype_cnt>", "</s_menutype_cnt>",
+    "<s_menuqty_cnt>", "</s_menuqty_cnt>",
+    "<s_total>", "</s_total>",
+    "<s_total_price>", "</s_total_price>",
+    "<s_cashprice>", "</s_cashprice>",
+    "<s_changeprice>", "</s_changeprice>",
+    "<s_creditcardprice>", "</s_creditcardprice>",
+    "<s_emoneyprice>", "</s_emoneyprice>",
+]
+
+
 def cord_to_target_sequence(ground_truth: dict) -> str:
     """CORD JSON ground_truth를 Florence-2 학습 타겟 시퀀스로 변환.
 
