@@ -112,6 +112,36 @@ WandB run 링크도 함께 첨부할 것.
     - rank=8, alpha=16, lr=5e-5, target_modules=[q_proj, v_proj]
   - **다음 액션**: 위 설정으로 epoch=15로 재학습 → F1 > 0 기대
 
+### 실험 4: LoRA 강화 + 특수 토큰 등록 (30 epoch)
+- **날짜**: 2026-03-20
+- **환경**: Google Colab T4, epoch=30
+- **가설**: rank 확장 + XML 태그 특수 토큰 등록으로 F1 > 0 달성 가능
+- **변경 사항**:
+  - LoRA r=8→16, alpha=16→32
+  - target_modules에 k_proj, out_proj, fc1, fc2 추가
+  - learning_rate 5e-5→1e-4
+  - CORD 19종 XML 태그를 특수 토큰으로 등록 (임베딩 평균 초기화)
+  - embed_tokens/lm_head를 modules_to_save로 full 학습
+  - normalize_xml_tags 강화 (s-, s,, s. 등 구분자 변형 처리)
+- **결과**:
+
+  | Metric | 값 |
+  |--------|-----|
+  | Best Field F1 | **0.1856** |
+  | val/field_f1 (final) | 0.1855 |
+  | val/CER (final) | 0.6387 |
+  | train/epoch_loss | 0.0617 |
+  | epoch | 30 |
+  | global_step | 12,000 |
+
+- **분석**:
+  - F1=0 벽을 돌파. XML 태그 포맷 생성 시작
+  - CER도 0.87→0.64로 큰 폭 개선
+  - train loss가 0.062로 매우 낮음 → 오버피팅 가능성 있음 (val F1이 낮은 이유)
+  - F1 0.18은 아직 낮음 → 더 많은 데이터 또는 정규화 강화 필요
+  - lr이 30 epoch 끝에서 ~1e-4로 높음 → warmup/cosine 스케줄 점검 필요
+- **WandB**: https://wandb.ai/sthun0211-home/korean-doc-understanding/runs/t93kjbex
+
 ### 실험 4: 데이터 비율 (영어:한국어)
 - **날짜**:
 - **가설**:

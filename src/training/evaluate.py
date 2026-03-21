@@ -106,8 +106,9 @@ def evaluate(
                     attention_mask=batch["attention_mask"].to(device),
                     decoder_input_ids=decoder_input_ids.expand(batch_size, -1),
                     max_new_tokens=max_new_tokens,
-                    num_beams=3,
+                    num_beams=4,
                     early_stopping=False,
+                    length_penalty=2.0,
                 )
 
             # Florence-2: 전체 output 디코딩 (slicing 없이) → XML 태그는 regex로 추출
