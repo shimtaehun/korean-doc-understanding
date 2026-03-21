@@ -142,6 +142,29 @@ WandB run 링크도 함께 첨부할 것.
   - lr이 30 epoch 끝에서 ~1e-4로 높음 → warmup/cosine 스케줄 점검 필요
 - **WandB**: https://wandb.ai/sthun0211-home/korean-doc-understanding/runs/t93kjbex
 
+### 실험 5: 오버피팅 억제 (dropout + lr 조정)
+- **날짜**: 2026-03-21
+- **환경**: Google Colab T4, epoch=20
+- **가설**: train_loss=0.062로 오버피팅이 F1 정체의 주원인. dropout 강화 + lr 낮추면 val F1 개선 가능
+- **변경 사항**:
+  - lora_dropout: 0.05 → 0.1
+  - learning_rate: 1e-4 → 5e-5
+  - epochs: 30 → 20
+  - warmup_ratio: 0.1 → 0.15
+- **설정**: r=16, alpha=32, target_modules=all, weight_decay=0.01
+- **결과**:
+
+  | Metric | 값 |
+  |--------|-----|
+  | Best Field F1 | |
+  | val/CER | |
+  | train/epoch_loss | |
+
+- **분석**:
+- **WandB**:
+
+---
+
 ### 실험 4: 데이터 비율 (영어:한국어)
 - **날짜**:
 - **가설**:
